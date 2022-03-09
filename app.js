@@ -24,7 +24,7 @@ app.post("/register", async (req, res) => {
     }
 
     // if use exist -> validate in db
-    const oldUser = await User.findOne({ email });
+    const oldUser = await User.findOne({ email: email.toLowerCase() });
     if (oldUser) {
       return res.status(409).send("User already exists. Please login");
     }
@@ -63,7 +63,7 @@ app.get("/login", async (req, res) => {
     }
 
     // validation user in db
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: email.toLowerCase() });
     if (user && (await bcrypt.compare(password, user.password))) {
       // create token
       const token = jwt.sign({ user_id: user._id, email }, TOKEN_KEY, {
@@ -72,7 +72,7 @@ app.get("/login", async (req, res) => {
       user.token = token;
       return res.status(200).json(user);
     }
-    return res.status(400).send("invalid creadential");
+    return res.status(400).send("invalid credential");
   } catch (err) {
     console.log(err);
   }
